@@ -143,7 +143,7 @@
                 padding-left: 40%;
                 padding-top: 12px;
                 padding-bottom: 12px;
-                text-align: right;
+                text-align: left;
                 min-height: 40px;
             }
             td:before {
@@ -235,8 +235,31 @@
     <script>
         document.getElementById('line-share-btn').addEventListener('click', function(e) {
             e.preventDefault();
-            const shareText = encodeURIComponent('今週の献立をチェック！');
-            const lineUrl = `https://line.me/R/msg/text/?${shareText}`;
+
+            let shareContent = '今週の献立表だよ！\n\n';
+            
+            const rows = document.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const day = row.querySelector('.day-of-week').textContent.trim();
+                const menu = row.querySelector('[data-label="献立"]').textContent.trim();
+                const ingredients = row.querySelector('[data-label="必要な具材"]').textContent.trim();
+
+                if (menu || ingredients) {
+                    shareContent += `【${day}】\n`;
+                    if (menu) {
+                        shareContent += `🍳献立: ${menu}\n`;
+                    }
+                    if (ingredients) {
+                        shareContent += `🛒具材: ${ingredients}\n`;
+                    }
+                    shareContent += '\n';
+                }
+            });
+
+            const encodedShareContent = encodeURIComponent(shareContent);
+            const lineUrl = `https://line.me/R/msg/text/?${encodedShareContent}`;
+            
             window.open(lineUrl, '_blank');
         });
     </script>
