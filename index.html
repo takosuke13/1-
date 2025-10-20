@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         body {
             font-family: 'M PLUS Rounded 1c', sans-serif;
@@ -56,6 +57,7 @@
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid #ffe0e6;
+            vertical-align: top;
         }
         th {
             background-color: #ffe0e6; /* ライトピンク */
@@ -66,19 +68,16 @@
             border-bottom: none;
         }
         
-        /* --- ここから変更 --- */
         td[contenteditable="true"] {
             cursor: text;
             transition: background-color 0.3s;
         }
-        /* プレースホルダーのスタイル */
         td[contenteditable="true"]:empty:before {
             content: attr(data-placeholder);
             color: #bbb;
             font-style: italic;
             cursor: text;
         }
-        /* 献立欄の背景色 */
         td[data-label="献立"] {
             background-color: #fffde7;
         }
@@ -86,7 +85,6 @@
             background-color: #fff9c4;
             outline: 2px solid #ffb3c1;
         }
-        /* 具材欄の背景色 */
         td[data-label="必要な具材"] {
             background-color: #f0fff0; /* ハニーデュー */
         }
@@ -94,18 +92,17 @@
             background-color: #e0f7fa; /* ライトシアン */
             outline: 2px solid #80deea;
         }
-        /* --- ここまで変更 --- */
 
         .day-of-week {
             font-weight: bold;
             color: #d96d79;
             width: 100px;
-            background-color: #fff !important; /* 曜日欄は色を固定 */
+            background-color: #fff !important;
         }
         .share-container {
             text-align: center;
         }
-        .line-share-button {
+        .action-button {
             display: inline-block;
             padding: 12px 30px;
             background: linear-gradient(45deg, #ff8c94, #ffb3c1);
@@ -117,8 +114,9 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(255, 140, 148, 0.4);
             border: none;
+            cursor: pointer;
         }
-        .line-share-button:hover {
+        .action-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(255, 140, 148, 0.5);
         }
@@ -147,6 +145,17 @@
         .memo-container textarea:focus {
             outline: 2px solid #ffb3c1;
             border-color: #ffb3c1;
+        }
+
+        .meal-image {
+            max-width: 150px;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+        input[type="file"] {
+            font-size: 0.9em;
         }
 
         @media (max-width: 768px) {
@@ -194,6 +203,7 @@
             }
             td.day-of-week:before { content: ""; }
             tr:last-child td:last-child { border-bottom: none; }
+            .meal-image { max-width: 100px; max-height: 100px; }
         }
     </style>
 </head>
@@ -207,12 +217,13 @@
             </p>
         </div>
 
-        <table>
+        <table id="meal-table">
             <thead>
                 <tr>
                     <th>曜日</th>
                     <th>🍳 献立</th>
                     <th>🛒 必要な具材</th>
+                    <th>📸 写真</th>
                 </tr>
             </thead>
             <tbody>
@@ -220,42 +231,70 @@
                     <td class="day-of-week" data-label="曜日">月曜日</td>
                     <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
                     <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
+                    <td data-label="写真">
+                        <input type="file" accept="image/*" class="image-upload">
+                        <img class="meal-image" src="" alt="食事の写真">
+                    </td>
                 </tr>
                 <tr>
                     <td class="day-of-week" data-label="曜日">火曜日</td>
                     <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
                     <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
+                    <td data-label="写真">
+                        <input type="file" accept="image/*" class="image-upload">
+                        <img class="meal-image" src="" alt="食事の写真">
+                    </td>
                 </tr>
                 <tr>
                     <td class="day-of-week" data-label="曜日">水曜日</td>
                     <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
                     <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
+                    <td data-label="写真">
+                        <input type="file" accept="image/*" class="image-upload">
+                        <img class="meal-image" src="" alt="食事の写真">
+                    </td>
                 </tr>
                 <tr>
                     <td class="day-of-week" data-label="曜日">木曜日</td>
                     <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
                     <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
+                    <td data-label="写真">
+                        <input type="file" accept="image/*" class="image-upload">
+                        <img class="meal-image" src="" alt="食事の写真">
+                    </td>
                 </tr>
                 <tr>
                     <td class="day-of-week" data-label="曜日">金曜日</td>
                     <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
                     <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
+                    <td data-label="写真">
+                        <input type="file" accept="image/*" class="image-upload">
+                        <img class="meal-image" src="" alt="食事の写真">
+                    </td>
                 </tr>
                 <tr>
                     <td class="day-of-week" data-label="曜日">土曜日</td>
                     <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
                     <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
+                    <td data-label="写真">
+                        <input type="file" accept="image/*" class="image-upload">
+                        <img class="meal-image" src="" alt="食事の写真">
+                    </td>
                 </tr>
                 <tr>
                     <td class="day-of-week" data-label="曜日">日曜日</td>
                     <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
                     <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
+                    <td data-label="写真">
+                        <input type="file" accept="image/*" class="image-upload">
+                        <img class="meal-image" src="" alt="食事の写真">
+                    </td>
                 </tr>
             </tbody>
         </table>
 
         <div class="share-container">
-            <a href="#" id="line-share-btn" class="line-share-button">LINEで共有する</a>
+            <button id="share-btn" class="action-button">共有する</button>
         </div>
 
         <div class="memo-container">
@@ -265,34 +304,58 @@
     </div>
 
     <script>
-        document.getElementById('line-share-btn').addEventListener('click', function(e) {
-            e.preventDefault();
+        const shareButton = document.getElementById('share-btn');
+        const elementToPrint = document.getElementById('meal-table');
+        const fileName = '1週間の献立表.pdf';
 
-            let shareContent = '今週の献立表だよ！\n\n';
-            
-            const rows = document.querySelectorAll('tbody tr');
+        // PDF生成と共有/保存のロジック
+        shareButton.addEventListener('click', async () => {
+            const opt = {
+                margin: 0.5,
+                filename: fileName,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
 
-            rows.forEach(row => {
-                const day = row.querySelector('.day-of-week').textContent.trim();
-                const menu = row.querySelector('[data-label="献立"]').textContent.trim();
-                const ingredients = row.querySelector('[data-label="必要な具材"]').textContent.trim();
+            try {
+                const pdfBlob = await html2pdf().set(opt).from(elementToPrint).output('blob');
+                const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-                if (menu || ingredients) {
-                    shareContent += `【${day}】\n`;
-                    if (menu) {
-                        shareContent += `🍳献立: ${menu}\n`;
-                    }
-                    if (ingredients) {
-                        shareContent += `🛒具材: ${ingredients}\n`;
-                    }
-                    shareContent += '\n';
+                // Web Share APIが使えるかチェック
+                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                    await navigator.share({
+                        title: '1週間の献立表',
+                        text: '今週の献立表を共有します。',
+                        files: [pdfFile]
+                    });
+                } else {
+                    // 使えない場合はダウンロード
+                    html2pdf().set(opt).from(elementToPrint).save();
                 }
-            });
+            } catch (error) {
+                console.error('共有またはPDF生成に失敗しました。', error);
+                // エラーが発生した場合やユーザーが共有をキャンセルした場合も、最終手段としてダウンロードを実行
+                html2pdf().set(opt).from(elementToPrint).save();
+            }
+        });
 
-            const encodedShareContent = encodeURIComponent(shareContent);
-            const lineUrl = `https://line.me/R/msg/text/?${encodedShareContent}`;
-            
-            window.open(lineUrl, '_blank');
+        // 画像アップロードとプレビュー
+        document.querySelectorAll('.image-upload').forEach(input => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) {
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgElement = e.target.nextElementSibling;
+                    imgElement.src = event.target.result;
+                    imgElement.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            });
         });
     </script>
 
