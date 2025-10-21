@@ -310,11 +310,14 @@
 
         // PDF生成と共有/保存のロジック
         shareButton.addEventListener('click', async () => {
+            // PDF生成のために一時的にスタイルを変更
+            elementToPrint.style.overflow = 'visible';
+
             const opt = {
                 margin: 0.5,
                 filename: fileName,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { scale: 2, useCORS: true, scrollY: -window.scrollY },
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
 
@@ -322,7 +325,6 @@
                 const pdfBlob = await html2pdf().set(opt).from(elementToPrint).output('blob');
                 const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-                // Web Share APIが使えるかチェック
                 if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
                     await navigator.share({
                         title: '1週間の献立表',
@@ -330,13 +332,14 @@
                         files: [pdfFile]
                     });
                 } else {
-                    // 使えない場合はダウンロード
                     html2pdf().set(opt).from(elementToPrint).save();
                 }
             } catch (error) {
                 console.error('共有またはPDF生成に失敗しました。', error);
-                // エラーが発生した場合やユーザーが共有をキャンセルした場合も、最終手段としてダウンロードを実行
                 html2pdf().set(opt).from(elementToPrint).save();
+            } finally {
+                // スタイルを元に戻す
+                elementToPrint.style.overflow = 'hidden';
             }
         });
 
@@ -344,9 +347,7 @@
         document.querySelectorAll('.image-upload').forEach(input => {
             input.addEventListener('change', function(e) {
                 const file = e.target.files[0];
-                if (!file) {
-                    return;
-                }
+                if (!file) return;
 
                 const reader = new FileReader();
                 reader.onload = function(event) {
