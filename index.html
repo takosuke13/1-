@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --base-font-size: 16px;
@@ -119,7 +119,7 @@
                 <!-- Day Rows Will be Inserted Here by JS -->
             </tbody>
         </table>
-        <div class="share-container"><button id="share-btn" class="action-button">共有する</button></div>
+        <div class="share-container"><button id="share-btn" class="action-button">画像で共有</button></div>
         <div class="memo-container">
             <h2>📝 その他メモ</h2>
             <textarea placeholder="買い物リストや気づいたことなどを自由にメモできます..."></textarea>
@@ -132,7 +132,7 @@
 
         // Generate table rows dynamically
         days.forEach((day, index) => {
-            const dayId = day.substring(0, 2); // e.g., 月, 火
+            const dayId = day.substring(0, 2);
             const row = `
                 <tr>
                     <td class="day-of-week" data-label="曜日">${day}</td>
@@ -151,26 +151,44 @@
             tbody.innerHTML += row;
         });
 
-        // PDF & Sharing Logic
+        // Image Sharing Logic
         const shareButton = document.getElementById('share-btn');
-        const elementToPrint = document.getElementById('meal-table');
-        shareButton.addEventListener('click', async () => {
-            elementToPrint.style.overflow = 'visible';
-            const opt = { margin: 0.5, filename: '1週間の献立表.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, scrollY: -window.scrollY }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
-            try {
-                const pdfBlob = await html2pdf().set(opt).from(elementToPrint).output('blob');
-                const pdfFile = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
-                if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-                    await navigator.share({ title: '1週間の献立表', text: '今週の献立表を共有します。', files: [pdfFile] });
-                } else {
-                    html2pdf().set(opt).from(elementToPrint).save();
-                }
-            } catch (error) {
-                console.error('Sharing or PDF generation failed', error);
-                html2pdf().set(opt).from(elementToPrint).save();
-            } finally {
-                elementToPrint.style.overflow = 'hidden';
-            }
+        const elementToCapture = document.getElementById('meal-table');
+        shareButton.addEventListener('click', () => {
+            const originalOverflow = elementToCapture.style.overflow;
+            elementToCapture.style.overflow = 'visible';
+
+            html2canvas(elementToCapture, { useCORS: true, scrollY: -window.scrollY, backgroundColor: '#ffffff' }).then(canvas => {
+                elementToCapture.style.overflow = originalOverflow;
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    const fileName = '1週間の献立表.jpg';
+                    const file = new File([blob], fileName, { type: 'image/jpeg' });
+
+                    try {
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: '1週間の献立表',
+                                text: '今週の献立表です！'
+                            });
+                        } else {
+                            throw new Error('Web Share API not supported.');
+                        }
+                    } catch (error) {
+                        console.warn('Web Share failed, falling back to download:', error);
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    }
+                }, 'image/jpeg', 0.95);
+            }).catch(error => {
+                elementToCapture.style.overflow = originalOverflow;
+                console.error('html2canvas failed:', error);
+            });
         });
 
         // Image Upload & Remove Logic
@@ -194,7 +212,7 @@
             });
 
             removeBtn.addEventListener('click', () => {
-                input.value = null; // Clear the file input
+                input.value = null;
                 img.src = '';
                 img.style.display = 'none';
                 removeBtn.style.display = 'none';
