@@ -10,13 +10,22 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
+        :root {
+            --base-font-size: 16px;
+            --text-color: #5c5c5c;
+            --primary-color: #ff8c94;
+            --light-pink: #ffe0e6;
+            --bg-color: #fff0f5;
+        }
         body {
             font-family: 'M PLUS Rounded 1c', sans-serif;
             line-height: 1.7;
-            color: #5c5c5c;
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
-            background-color: #fff0f5; /* ラベンダーブラッシュ */
+            background-color: var(--bg-color);
+            font-size: var(--base-font-size);
+            -webkit-tap-highlight-color: transparent;
         }
         .container {
             max-width: 1000px;
@@ -28,7 +37,7 @@
         }
         h1 {
             text-align: center;
-            color: #ff8c94; /* パステルレッド */
+            color: var(--primary-color);
             margin-bottom: 20px;
             font-weight: 700;
         }
@@ -37,266 +46,80 @@
             color: #888;
             margin-bottom: 30px;
             background-color: #fff9c4;
-            padding: 10px;
+            padding: 10px 15px;
             border-radius: 10px;
             display: inline-block;
         }
-        .description-wrapper {
-            text-align: center;
-        }
+        .description-wrapper { text-align: center; }
         table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
             margin-bottom: 30px;
-            border: 1px solid #ffe0e6; /* ライトピンク */
+            border: 1px solid var(--light-pink);
             border-radius: 15px;
             overflow: hidden;
         }
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ffe0e6;
-            vertical-align: top;
-        }
-        th {
-            background-color: #ffe0e6; /* ライトピンク */
-            color: #d96d79;
-            font-weight: 700;
-        }
-        tr:last-child td {
-            border-bottom: none;
-        }
-        
-        td[contenteditable="true"] {
-            cursor: text;
-            transition: background-color 0.3s;
-        }
-        td[contenteditable="true"]:empty:before {
-            content: attr(data-placeholder);
-            color: #bbb;
-            font-style: italic;
-            cursor: text;
-        }
-        td[data-label="献立"] {
-            background-color: #fffde7;
-        }
-        td[data-label="献立"]:focus {
-            background-color: #fff9c4;
-            outline: 2px solid #ffb3c1;
-        }
-        td[data-label="必要な具材"] {
-            background-color: #f0fff0; /* ハニーデュー */
-        }
-        td[data-label="必要な具材"]:focus {
-            background-color: #e0f7fa; /* ライトシアン */
-            outline: 2px solid #80deea;
-        }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--light-pink); vertical-align: top; }
+        th { background-color: var(--light-pink); color: #d96d79; font-weight: 700; }
+        tr:last-child td { border-bottom: none; }
+        td[contenteditable="true"] { cursor: text; transition: background-color 0.3s; }
+        td[contenteditable="true"]:empty:before { content: attr(data-placeholder); color: #bbb; font-style: italic; cursor: text; }
+        td[data-label="献立"] { background-color: #fffde7; }
+        td[data-label="献立"]:focus { background-color: #fff9c4; outline: 2px solid #ffb3c1; }
+        td[data-label="必要な具材"] { background-color: #f0fff0; }
+        td[data-label="必要な具材"]:focus { background-color: #e0f7fa; outline: 2px solid #80deea; }
+        .day-of-week { font-weight: bold; color: #d96d79; width: 100px; background-color: #fff !important; }
+        .share-container { text-align: center; }
+        .action-button { display: inline-block; padding: 12px 30px; background: linear-gradient(45deg, #ff8c94, #ffb3c1); color: #fff; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1em; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(255, 140, 148, 0.4); border: none; cursor: pointer; }
+        .action-button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 140, 148, 0.5); }
+        .memo-container { margin-top: 40px; text-align: center; }
+        .memo-container h2 { color: #d96d79; margin-bottom: 15px; font-size: 1.2em; }
+        .memo-container textarea { width: 100%; height: 200px; padding: 15px; border-radius: 15px; border: 1px solid var(--light-pink); font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 1em; line-height: 1.6; resize: vertical; box-sizing: border-box; }
+        .memo-container textarea:focus { outline: 2px solid #ffb3c1; border-color: #ffb3c1; }
 
-        .day-of-week {
-            font-weight: bold;
-            color: #d96d79;
-            width: 100px;
-            background-color: #fff !important;
-        }
-        .share-container {
-            text-align: center;
-        }
-        .action-button {
-            display: inline-block;
-            padding: 12px 30px;
-            background: linear-gradient(45deg, #ff8c94, #ffb3c1);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(255, 140, 148, 0.4);
-            border: none;
-            cursor: pointer;
-        }
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 140, 148, 0.5);
-        }
+        /* Image Upload Styles */
+        .image-upload-wrapper { position: relative; }
+        .image-upload { width: 0; height: 0; overflow: hidden; }
+        .upload-label { display: inline-block; padding: 10px 15px; background-color: #f0f0f0; border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.9em; transition: background-color 0.2s; }
+        .upload-label:hover { background-color: #e0e0e0; }
+        .meal-image { display: none; border-radius: 10px; margin-top: 10px; max-width: 150px; max-height: 150px; }
+        .remove-image-btn { display: none; position: absolute; top: 15px; right: 5px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; line-height: 24px; text-align: center; cursor: pointer; }
 
-        .memo-container {
-            margin-top: 40px;
-            text-align: center;
-        }
-        .memo-container h2 {
-            color: #d96d79;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-        .memo-container textarea {
-            width: 100%;
-            height: 200px;
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #ffe0e6;
-            font-family: 'M PLUS Rounded 1c', sans-serif;
-            font-size: 1em;
-            line-height: 1.6;
-            resize: vertical;
-            box-sizing: border-box;
-        }
-        .memo-container textarea:focus {
-            outline: 2px solid #ffb3c1;
-            border-color: #ffb3c1;
-        }
-
-        .meal-image {
-            max-width: 150px;
-            max-height: 150px;
-            margin-top: 10px;
-            border-radius: 10px;
-            display: none;
-        }
-        input[type="file"] {
-            font-size: 0.9em;
-        }
-
+        /* --- iPhone Optimization --- */
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 20px; }
-            table { border: none; border-radius: 0; }
+            body { padding: 10px; font-size: 15px; }
+            .container { padding: 15px; }
+            h1 { font-size: 1.8em; }
+            table { border: none; border-radius: 0; background: transparent; }
             table, thead, tbody, th, td, tr { display: block; }
-            thead tr { position: absolute; top: -9999px; left: -9999px; }
-            tr {
-                border: none;
-                border-radius: 15px;
-                margin-bottom: 15px;
-                overflow: hidden;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.07);
-                background: #fff;
-            }
-            td {
-                border: none;
-                border-bottom: 1px dotted #eee;
-                position: relative;
-                padding-left: 40%;
-                padding-top: 12px;
-                padding-bottom: 12px;
-                text-align: left;
-                min-height: 40px;
-            }
-            td:before {
-                position: absolute;
-                left: 15px;
-                width: 35%;
-                padding-right: 10px;
-                white-space: nowrap;
-                text-align: left;
-                font-weight: bold;
-                content: attr(data-label);
-                color: #ff8c94;
-            }
-            td.day-of-week {
-                padding-left: 15px;
-                text-align: center;
-                background-color: #ff8c94 !important;
-                color: white;
-                font-size: 1.2em;
-                border-radius: 15px 15px 0 0;
-            }
-            td.day-of-week:before { content: ""; }
-            tr:last-child td:last-child { border-bottom: none; }
-            .meal-image { max-width: 100px; max-height: 100px; }
+            thead tr { display: none; }
+            tr { border: none; border-radius: 15px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); background: #fff; }
+            td { border: none; border-bottom: 1px solid #f5f5f5; position: relative; padding: 15px; padding-left: 38%; min-height: 50px; }
+            td:before { position: absolute; left: 15px; width: 35%; padding-right: 10px; white-space: nowrap; text-align: left; font-weight: bold; content: attr(data-label); color: var(--primary-color); }
+            td:last-child { border-bottom: none; }
+            td.day-of-week { padding: 12px 15px; text-align: center; background-color: var(--primary-color) !important; color: white; font-size: 1.3em; border-radius: 15px 15px 0 0; }
+            td.day-of-week:before { display: none; }
+            td[contenteditable] { -webkit-user-select: text; user-select: text; }
+            .meal-image { max-width: 100%; height: auto; max-height: 180px; object-fit: cover; margin-top: 10px; width: 100%; }
+            .upload-label { width: 100%; box-sizing: border-box; }
+            .remove-image-btn { top: 15px; right: 15px; }
         }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>🍽️ 1週間の献立表 🍰</h1>
-        <div class="description-wrapper">
-            <p class="description">
-                「献立」と「具材」の欄はクリックして編集できます✨
-            </p>
-        </div>
-
+        <div class="description-wrapper"><p class="description">「献立」と「具材」欄はタップして編集できます✨</p></div>
         <table id="meal-table">
             <thead>
-                <tr>
-                    <th>曜日</th>
-                    <th>🍳 献立</th>
-                    <th>🛒 必要な具材</th>
-                    <th>📸 写真</th>
-                </tr>
+                <tr><th>曜日</th><th>🍳 献立</th><th>🛒 必要な具材</th><th>📸 写真</th></tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="day-of-week" data-label="曜日">月曜日</td>
-                    <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
-                    <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
-                    <td data-label="写真">
-                        <input type="file" accept="image/*" class="image-upload">
-                        <img class="meal-image" src="" alt="食事の写真">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="day-of-week" data-label="曜日">火曜日</td>
-                    <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
-                    <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
-                    <td data-label="写真">
-                        <input type="file" accept="image/*" class="image-upload">
-                        <img class="meal-image" src="" alt="食事の写真">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="day-of-week" data-label="曜日">水曜日</td>
-                    <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
-                    <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
-                    <td data-label="写真">
-                        <input type="file" accept="image/*" class="image-upload">
-                        <img class="meal-image" src="" alt="食事の写真">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="day-of-week" data-label="曜日">木曜日</td>
-                    <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
-                    <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
-                    <td data-label="写真">
-                        <input type="file" accept="image/*" class="image-upload">
-                        <img class="meal-image" src="" alt="食事の写真">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="day-of-week" data-label="曜日">金曜日</td>
-                    <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
-                    <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
-                    <td data-label="写真">
-                        <input type="file" accept="image/*" class="image-upload">
-                        <img class="meal-image" src="" alt="食事の写真">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="day-of-week" data-label="曜日">土曜日</td>
-                    <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
-                    <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
-                    <td data-label="写真">
-                        <input type="file" accept="image/*" class="image-upload">
-                        <img class="meal-image" src="" alt="食事の写真">
-                    </td>
-                </tr>
-                <tr>
-                    <td class="day-of-week" data-label="曜日">日曜日</td>
-                    <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
-                    <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
-                    <td data-label="写真">
-                        <input type="file" accept="image/*" class="image-upload">
-                        <img class="meal-image" src="" alt="食事の写真">
-                    </td>
-                </tr>
+                <!-- Day Rows Will be Inserted Here by JS -->
             </tbody>
         </table>
-
-        <div class="share-container">
-            <button id="share-btn" class="action-button">共有する</button>
-        </div>
-
+        <div class="share-container"><button id="share-btn" class="action-button">共有する</button></div>
         <div class="memo-container">
             <h2>📝 その他メモ</h2>
             <textarea placeholder="買い物リストや気づいたことなどを自由にメモできます..."></textarea>
@@ -304,61 +127,80 @@
     </div>
 
     <script>
+        const days = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日'];
+        const tbody = document.querySelector('#meal-table tbody');
+
+        // Generate table rows dynamically
+        days.forEach((day, index) => {
+            const dayId = day.substring(0, 2); // e.g., 月, 火
+            const row = `
+                <tr>
+                    <td class="day-of-week" data-label="曜日">${day}</td>
+                    <td data-label="献立" contenteditable="true" data-placeholder="今日のメニューは？"></td>
+                    <td data-label="必要な具材" contenteditable="true" data-placeholder="お買い物リスト"></td>
+                    <td data-label="写真">
+                        <div class="image-upload-wrapper">
+                            <input type="file" accept="image/*" class="image-upload" id="image-upload-${dayId}">
+                            <label for="image-upload-${dayId}" class="upload-label">📸 写真を追加</label>
+                            <img class="meal-image" alt="食事の写真">
+                            <button type="button" class="remove-image-btn">&times;</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+
+        // PDF & Sharing Logic
         const shareButton = document.getElementById('share-btn');
         const elementToPrint = document.getElementById('meal-table');
-        const fileName = '1週間の献立表.pdf';
-
-        // PDF生成と共有/保存のロジック
         shareButton.addEventListener('click', async () => {
-            // PDF生成のために一時的にスタイルを変更
             elementToPrint.style.overflow = 'visible';
-
-            const opt = {
-                margin: 0.5,
-                filename: fileName,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, scrollY: -window.scrollY },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
+            const opt = { margin: 0.5, filename: '1週間の献立表.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, scrollY: -window.scrollY }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
             try {
                 const pdfBlob = await html2pdf().set(opt).from(elementToPrint).output('blob');
-                const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
-
+                const pdfFile = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
                 if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-                    await navigator.share({
-                        title: '1週間の献立表',
-                        text: '今週の献立表を共有します。',
-                        files: [pdfFile]
-                    });
+                    await navigator.share({ title: '1週間の献立表', text: '今週の献立表を共有します。', files: [pdfFile] });
                 } else {
                     html2pdf().set(opt).from(elementToPrint).save();
                 }
             } catch (error) {
-                console.error('共有またはPDF生成に失敗しました。', error);
+                console.error('Sharing or PDF generation failed', error);
                 html2pdf().set(opt).from(elementToPrint).save();
             } finally {
-                // スタイルを元に戻す
                 elementToPrint.style.overflow = 'hidden';
             }
         });
 
-        // 画像アップロードとプレビュー
-        document.querySelectorAll('.image-upload').forEach(input => {
-            input.addEventListener('change', function(e) {
+        // Image Upload & Remove Logic
+        document.querySelectorAll('.image-upload-wrapper').forEach(wrapper => {
+            const input = wrapper.querySelector('.image-upload');
+            const label = wrapper.querySelector('.upload-label');
+            const img = wrapper.querySelector('.meal-image');
+            const removeBtn = wrapper.querySelector('.remove-image-btn');
+
+            input.addEventListener('change', e => {
                 const file = e.target.files[0];
                 if (!file) return;
-
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    const imgElement = e.target.nextElementSibling;
-                    imgElement.src = event.target.result;
-                    imgElement.style.display = 'block';
-                }
+                reader.onload = event => {
+                    img.src = event.target.result;
+                    img.style.display = 'block';
+                    removeBtn.style.display = 'block';
+                    label.style.display = 'none';
+                };
                 reader.readAsDataURL(file);
+            });
+
+            removeBtn.addEventListener('click', () => {
+                input.value = null; // Clear the file input
+                img.src = '';
+                img.style.display = 'none';
+                removeBtn.style.display = 'none';
+                label.style.display = 'inline-block';
             });
         });
     </script>
-
 </body>
 </html>
